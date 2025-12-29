@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohamed & Nelly | Forever Begins</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600&family=Montserrat:wght@300;400&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gold': '#D4AF37',
+                        'gold-light': '#F3E5AB',
+                        'deep-rose': '#881337',
+                        'soft-pink': '#FFF0F5',
+                    },
+                    fontFamily: {
+                        'script': ['"Alex Brush"', 'cursive'],
+                        'classic': ['"Cinzel"', 'serif'],
+                        'body': ['"Montserrat"', 'sans-serif'],
+                        'hand': ['"Caveat"', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFF0F5;
+            overflow-x: hidden;
+        }
+        /* Fixed Background Pattern */
+        .bg-pattern {
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(350,33%,96%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 100%, hsla(350,33%,96%,1) 0, transparent 50%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -20;
+        }
+        
+        .gold-text {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        /* --- STICKER PAPER STYLES --- */
+        .sticker-note {
+            background-color: #fdfbf7;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.1s ease-out; 
+            will-change: transform;
+        }
+
+        .sticker-note::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+        }
+        
+        .loose-leaf {
+            transform-origin: top left;
+        }
+
+        .photo-grid-item {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+        }
+
+        /* Custom Notification Toast */
+        #notification-toast {
+            visibility: hidden; 
+            min-width: 250px; 
+            background-color: #881337; 
+            color: #fff; 
+            text-align: center; 
+            border-radius: 50px; 
+            padding: 16px; 
+            position: fixed; 
+            z-index: 100; 
+            left: 50%; 
+            bottom: 30px; 
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #notification-toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="font-body text-gray-700">
+
+    <!-- Fixed Background Elements -->
+    <div class="bg-pattern"></div>
+    <div class="fixed top-0 left-0 w-64 h-64 bg-rose-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse -z-10"></div>
+    <div class="fixed bottom-0 right-0 w-80 h-80 bg-gold-light rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse -z-10"></div>
+
+    <!-- SECTION 1: INTRO (Stickers Only) -->
+    <section class="h-screen flex flex-col items-center justify-center relative z-10 overflow-hidden">
+        
+        <!-- STICKER ANIMATION CONTAINER -->
+        <div class="flex justify-center items-center gap-6 md:gap-10 mb-8 h-32 relative scale-125 md:scale-150">
+            
+            <!-- Paper 1: Save -->
+            <div class="sticker-note w-24 h-24 md:w-32 md:h-32 rotate-[-6deg] z-10">
+                <span class="font-hand text-4xl md:text-5xl text-deep-rose">Save</span>
+            </div>
+
+            <!-- Stack Container for Me/Date -->
+            <div class="relative w-24 h-24 md:w-32 md:h-32">
+                
+                <!-- Paper 3: The Date (Hidden behind originally) -->
+                <div class="sticker-note w-full h-full rotate-[3deg] absolute inset-0 z-0 bg-gold-light/20 border border-gold/20">
+                    <div class="flex flex-col items-center leading-none mt-2">
+                        <span class="font-hand text-xl md:text-2xl text-gray-600">The</span>
+                        <span class="font-hand text-3xl md:text-4xl text-deep-rose font-bold">Date</span>
+                    </div>
+                </div>
+
+                <!-- Paper 2: Me (Falls on scroll) -->
+                <div id="falling-note" class="sticker-note loose-leaf w-full h-full rotate-[2deg] absolute inset-0 z-20 cursor-grab">
+                    <span class="font-hand text-4xl md:text-5xl text-deep-rose">Me</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Hint -->
+        <div class="absolute bottom-12 flex flex-col items-center gap-2 opacity-60 animate-bounce">
+            <span class="text-xs uppercase tracking-[0.3em] text-deep-rose">Scroll Down</span>
+            <i class="fa-solid fa-chevron-down text-deep-rose text-xl"></i>
+        </div>
+    </section>
+
+    <!-- SECTION 2: MAIN CARD (Scrolls into view) -->
+    <section class="min-h-screen flex flex-col items-center justify-start pt-10 md:pt-20 p-6 relative z-20">
+        
+        <div data-aos="fade-up" data-aos-duration="1200" class="glass-panel p-8 md:p-16 rounded-[3rem] text-center max-w-3xl w-full relative border-t-4 border-gold">
+            
+            <div class="relative z-10">
+                <h1 class="font-script text-7xl md:text-9xl text-deep-rose mb-2 leading-none">
+                    Mohamed
+                </h1>
+                <span class="font-classic text-3xl md:text-4xl gold-text block my-2">&</span>
+                <h1 class="font-script text-7xl md:text-9xl text-deep-rose mb-12 leading-none">
+                    Nelly
+                </h1>
+
+                <div class="flex items-center justify-center gap-4 mb-10">
+                    <span class="h-[1px] w-12 bg-gold"></span>
+                    <p class="font-classic text-xl md:text-2xl text-gray-800 tracking-widest">FEBRUARY 06, 2026</p>
+                    <span class="h-[1px] w-12 bg-gold"></span>
+                </div>
+
+                <div id="countdown" class="grid grid-cols-4 gap-2 md:gap-6 mb-12 max-w-lg mx-auto">
+                    <!-- Countdown JS fills this -->
+                </div>
+
+                <p class="font-body italic text-gray-500">We are getting engaged!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Details Section -->
+    <section class="py-20 px-4 bg-white/30 backdrop-blur-sm">
+        <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+            
+            <div data-aos="fade-right" class="glass-panel p-8 rounded-2xl text-center md:text-left">
+                
+                <div class="relative z-10">
+                    <h2 class="font-classic text-3xl text-deep-rose mb-4">The Ceremony</h2>
+                    <div class="space-y-2 mb-6">
+                        <p class="font-bold text-lg"><i class="fa-regular fa-clock text-gold mr-2"></i> 7:00 PM</p>
+                        <p class="font-bold text-lg"><i class="fa-solid fa-location-dot text-gold mr-2"></i> Royal L'amour Classic</p>
+                        <p class="text-gray-500 ml-6">Ball Room A, Alexandria, Egypt</p>
+                    </div>
+                    
+                    <a id="maps-link" href="#" target="_blank" class="inline-block bg-deep-rose text-white px-8 py-3 rounded-full hover:bg-rose-900 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        Get Directions
+                    </a>
+                </div>
+            </div>
+
+            <div data-aos="fade-left" class="flex flex-col items-center justify-center">
+                <div class="glass-panel p-6 rounded-xl rotate-2 hover:rotate-0 transition-all duration-500">
+                    <!-- DIV for QR code injection -->
+                    <div id="qrcode" class="opacity-90 relative z-10 bg-white p-2 rounded-lg"></div>
+                </div>
+                <p class="text-xs uppercase tracking-widest mt-4 text-gray-400">Scan for Location</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Memories Section (UPLOAD ONLY) -->
+    <section class="py-20 px-4 relative">
+        <div class="max-w-5xl mx-auto">
+            <div data-aos="fade-up" class="text-center mb-12">
+                <h2 class="font-script text-6xl text-deep-rose mb-2">Share Your Photos</h2>
+                <p class="text-gray-500 font-classic">We'd love to see your memories from the night!</p>
+            </div>
+
+            <div data-aos="zoom-in" class="glass-panel p-8 rounded-2xl mb-12 text-center max-w-xl mx-auto border-2 border-dashed border-gold/30 hover:border-gold transition-colors">
+                
+                <div class="relative z-10">
+                    <i class="fa-solid fa-images text-4xl text-gold mb-4"></i>
+                    <h3 class="font-classic text-xl mb-2">Upload Photos</h3>
+                    <p class="text-sm text-gray-500 mb-6">Select photos to send directly to us.</p>
+                    
+                    <label class="cursor-pointer bg-gold text-white px-8 py-3 rounded-full hover:bg-yellow-600 transition-colors shadow-md inline-block">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Choose Files
+                        <input type="file" id="multi-photo-upload" accept="image/*" multiple class="hidden">
+                    </label>
+                    
+                    <div id="upload-status" class="mt-4 text-sm font-bold text-deep-rose hidden">Uploading...</div>
+                    <div id="file-list" class="mt-4 text-xs text-gray-500 text-left space-y-1"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guestbook Section -->
+    <section class="py-20 px-4 relative">
+        <div class="max-w-3xl mx-auto">
+            <div data-aos="fade-up" class="text-center mb-10">
+                <h2 class="font-script text-5xl text-deep-rose mb-2">Guestbook</h2>
+                <p class="text-gray-500 font-classic">Leave us a wish</p>
+            </div>
+
+            <div data-aos="fade-up" class="glass-panel p-8 rounded-2xl mb-12">
+                
+                <div class="grid gap-4 relative z-10">
+                    <input type="text" id="guest-name" placeholder="Your Name" class="w-full bg-white/50 border-b-2 border-gold/30 p-3 focus:outline-none focus:border-gold transition-colors font-body">
+                    
+                    <textarea id="guest-msg" placeholder="Write a beautiful message for M & N..." rows="2" class="w-full bg-white/50 border-b-2 border-gold/30 p-3 focus:outline-none focus:border-gold transition-colors font-body"></textarea>
+                    
+                    <button onclick="submitMessage()" class="bg-deep-rose text-white font-classic py-3 rounded-lg hover:bg-rose-900 transition-colors shadow-md mt-2">
+                        Send Love
+                    </button>
+                    <p id="msg-status" class="text-center text-sm mt-2 hidden"></p>
+                </div>
+            </div>
+
+            <div id="messages-container" class="space-y-4">
+                <!-- Messages load here -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-10 text-gray-400 text-xs tracking-widest bg-white/80">
+        MADE WITH LOVE FOR MOHAMED & NELLY
+    </footer>
+    
+    <!-- Notification Toast Element -->
+    <div id="notification-toast">Message</div>
+
+    <script>
+        // Initialize AOS
+        AOS.init({ once: true, offset: 100 });
+
+        /* =========================================
+           1. BASIC CONFIGURATION (Runs Immediately)
+           ========================================= */
+        const eventDate = new Date(2026, 1, 6, 19, 0, 0); 
+        const googleMapsUrl = "https://maps.app.goo.gl/cju4uTpEJXQLjYMh8?g_st=ac"; 
+
+        // Set "Get Directions" link immediately
+        const mapBtn = document.getElementById('maps-link');
+        if(mapBtn) mapBtn.href = googleMapsUrl;
+
+        // Generate QR Code on load
+        window.addEventListener('load', () => {
+             const qrElement = document.getElementById("qrcode");
+             if(qrElement) {
+                 qrElement.innerHTML = "";
+                 new QRCode(qrElement, {
+                    text: googleMapsUrl,
+                    width: 100,
+                    height: 100,
+                    colorDark : "#881337",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+             }
+        });
+
+        // Countdown Logic
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = eventDate.getTime() - now;
+            
+            if(distance < 0) {
+                const el = document.getElementById("countdown");
+                if(el) el.innerHTML = "<div class='col-span-4 text-center text-3xl font-classic text-deep-rose'>Today is the day!</div>"; 
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const units = [
+                {v: days, l: 'Days'}, {v: hours, l: 'Hrs'}, 
+                {v: minutes, l: 'Mins'}, {v: seconds, l: 'Secs'}
+            ];
+
+            let html = units.map(u => `
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl md:text-5xl font-classic text-deep-rose">${u.v}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-gold mt-1">${u.l}</span>
+                </div>
+            `).join('');
+            const cdEl = document.getElementById("countdown");
+            if(cdEl) cdEl.innerHTML = html;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Falling Note Logic
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const fallingNote = document.getElementById('falling-note');
+            
+            if (fallingNote) {
+                const limit = window.innerHeight * 2; 
+                const speed = 1.35; 
+
+                if (scrollY * speed > limit) {
+                    fallingNote.style.visibility = 'hidden';
+                } else {
+                    fallingNote.style.visibility = 'visible';
+                    const translateY = scrollY * speed; 
+                    const rotate = 2 + (scrollY * 0.1); 
+                    fallingNote.style.transform = `translate3d(0, ${translateY}px, 0) rotate(${rotate}deg)`;
+                }
+            }
+        });
+
+        // Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById("notification-toast");
+            if(toast) {
+                toast.innerText = message;
+                toast.className = "show";
+                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+            }
+        }
+
+        /* =========================================
+           2. FIREBASE CONFIGURATION & LOGIC
+           ========================================= */
+        
+        // YOUR SPECIFIC FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyC98RgcDV0R7-r-sfK2hvyqtefnnNJNBOA",
+            authDomain: "mnengagement-invite-b38f3.firebaseapp.com",
+            projectId: "mnengagement-invite-b38f3",
+            storageBucket: "mnengagement-invite-b38f3.firebasestorage.app",
+            messagingSenderId: "1046860640192",
+            appId: "1:1046860640192:web:8f4ef5749fb6e73f372225",
+            measurementId: "G-2W3S10NWNX"
+        };
+
+        // Initialize Firebase safely
+        let db, storage, auth;
+        let isFirebaseReady = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            storage = firebase.storage();
+            isFirebaseReady = true;
+        } catch (e) {
+            console.error("Firebase init error:", e);
+        }
+
+        // Setup App Logic
+        async function setupApp() {
+            if (!isFirebaseReady) return;
+
+            // 1. Authenticate (Anonymous)
+            try {
+                await auth.signInAnonymously();
+                console.log("Signed in anonymously");
+            } catch (e) {
+                console.error("Auth Error:", e);
+                return;
+            }
+
+            // 2. Collection Reference (Simplified for standard Firebase structure)
+            const getCollection = (name) => db.collection(name);
+
+            // 3. Load Messages
+            getCollection('messages').orderBy('timestamp', 'desc').limit(20)
+            .onSnapshot(snapshot => {
+                const container = document.getElementById('messages-container');
+                if(!container) return;
+                container.innerHTML = "";
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const msgHtml = `
+                        <div data-aos="fade-up" class="bg-white p-4 rounded-xl shadow-sm border border-pink-50 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-1 relative z-10">
+                                <h4 class="font-classic text-deep-rose font-bold text-sm">${data.name}</h4>
+                            </div>
+                            <p class="font-body text-gray-600 text-sm italic relative z-10">"${data.text}"</p>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', msgHtml);
+                });
+            }, error => console.error("Message sync error:", error));
+            
+            // 4. Submit Message Function
+            window.submitMessage = async function() {
+                const name = document.getElementById('guest-name').value;
+                const msg = document.getElementById('guest-msg').value;
+                const status = document.getElementById('msg-status');
+                
+                if(!name || !msg) { 
+                    showToast("Please fill in your name and message!"); 
+                    return; 
+                }
+
+                if(status) {
+                    status.style.display = 'block';
+                    status.innerText = "Sending...";
+                }
+
+                try {
+                    await getCollection('messages').add({
+                        name: name, text: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    document.getElementById('guest-name').value = "";
+                    document.getElementById('guest-msg').value = "";
+                    if(status) {
+                        status.innerText = "Message sent!";
+                        setTimeout(() => status.style.display = 'none', 2000);
+                    }
+                } catch (error) { 
+                    console.error(error); 
+                    if(status) status.innerText = "Error sending.";
+                }
+            }
+            
+            // 5. Upload Function
+            const photoInput = document.getElementById('multi-photo-upload');
+            if (photoInput) {
+                photoInput.addEventListener('change', async (e) => {
+                    const files = e.target.files;
+                    if (!files.length) return;
+
+                    const status = document.getElementById('upload-status');
+                    const fileList = document.getElementById('file-list');
+                    
+                    if(status) {
+                        status.style.display = 'block';
+                        status.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading ${files.length} photo(s)...`;
+                    }
+                    if(fileList) fileList.innerHTML = '';
+
+                    try {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            if(!file.type.startsWith('image/')) continue;
+
+                            // Storage path: gallery/timestamp_index_name
+                            const storageRef = storage.ref(`gallery/${Date.now()}_${i}_${file.name}`);
+                            
+                            const snapshot = await storageRef.put(file);
+                            const downloadURL = await snapshot.ref.getDownloadURL();
+
+                            // Save metadata to Firestore, but don't display it on the site
+                            await getCollection('gallery').add({
+                                url: downloadURL,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+
+                            if(fileList) {
+                                const div = document.createElement('div');
+                                div.innerHTML = `<i class="fa-solid fa-check text-green-500"></i> ${file.name}`;
+                                fileList.appendChild(div);
+                            }
+                        }
+                        if(status) {
+                            status.innerHTML = `<span class="text-green-600">Photos sent! Thank you!</span>`;
+                            setTimeout(() => {
+                                status.style.display = 'none';
+                                fileList.innerHTML = '';
+                                photoInput.value = '';
+                            }, 3000);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        if(status) status.innerHTML = `<span class="text-red-500">Error uploading photos: ${error.message}</span>`;
+                    }
+                });
+            }
+        }
+
+        // Run setup
+        setupApp();
+    </script>
+</body>
+</html>
