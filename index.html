@@ -16,7 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <!-- Storage SDK removed -->
 
     <script>
         tailwind.config = {
@@ -98,11 +98,6 @@
         
         .loose-leaf {
             transform-origin: top left;
-        }
-
-        .photo-grid-item {
-            break-inside: avoid;
-            margin-bottom: 1rem;
         }
 
         /* Custom Notification Toast */
@@ -232,33 +227,6 @@
         </div>
     </section>
 
-    <!-- Memories Section (UPLOAD ONLY) -->
-    <section class="py-20 px-4 relative">
-        <div class="max-w-5xl mx-auto">
-            <div data-aos="fade-up" class="text-center mb-12">
-                <h2 class="font-script text-6xl text-deep-rose mb-2">Share Your Photos</h2>
-                <p class="text-gray-500 font-classic">We'd love to see your memories from the night!</p>
-            </div>
-
-            <div data-aos="zoom-in" class="glass-panel p-8 rounded-2xl mb-12 text-center max-w-xl mx-auto border-2 border-dashed border-gold/30 hover:border-gold transition-colors">
-                
-                <div class="relative z-10">
-                    <i class="fa-solid fa-images text-4xl text-gold mb-4"></i>
-                    <h3 class="font-classic text-xl mb-2">Upload Photos</h3>
-                    <p class="text-sm text-gray-500 mb-6">Select photos to send directly to us.</p>
-                    
-                    <label class="cursor-pointer bg-gold text-white px-8 py-3 rounded-full hover:bg-yellow-600 transition-colors shadow-md inline-block">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Choose Files
-                        <input type="file" id="multi-photo-upload" accept="image/*" multiple class="hidden">
-                    </label>
-                    
-                    <div id="upload-status" class="mt-4 text-sm font-bold text-deep-rose hidden">Uploading...</div>
-                    <div id="file-list" class="mt-4 text-xs text-gray-500 text-left space-y-1"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Guestbook Section -->
     <section class="py-20 px-4 relative">
         <div class="max-w-3xl mx-auto">
@@ -288,7 +256,7 @@
     </section>
 
     <footer class="text-center py-10 text-gray-400 text-xs tracking-widest bg-white/80">
-        MADE WITH LOVE FOR MOHAMED & NELLY
+        MADE WITH LOVE
     </footer>
     
     <!-- Notification Toast Element -->
@@ -403,14 +371,13 @@
         };
 
         // Initialize Firebase safely
-        let db, storage, auth;
+        let db, auth;
         let isFirebaseReady = false;
 
         try {
             firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
             db = firebase.firestore();
-            storage = firebase.storage();
             isFirebaseReady = true;
         } catch (e) {
             console.error("Firebase init error:", e);
@@ -483,60 +450,6 @@
                     console.error(error); 
                     if(status) status.innerText = "Error sending.";
                 }
-            }
-            
-            // 5. Upload Function
-            const photoInput = document.getElementById('multi-photo-upload');
-            if (photoInput) {
-                photoInput.addEventListener('change', async (e) => {
-                    const files = e.target.files;
-                    if (!files.length) return;
-
-                    const status = document.getElementById('upload-status');
-                    const fileList = document.getElementById('file-list');
-                    
-                    if(status) {
-                        status.style.display = 'block';
-                        status.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading ${files.length} photo(s)...`;
-                    }
-                    if(fileList) fileList.innerHTML = '';
-
-                    try {
-                        for (let i = 0; i < files.length; i++) {
-                            const file = files[i];
-                            if(!file.type.startsWith('image/')) continue;
-
-                            // Storage path: gallery/timestamp_index_name
-                            const storageRef = storage.ref(`gallery/${Date.now()}_${i}_${file.name}`);
-                            
-                            const snapshot = await storageRef.put(file);
-                            const downloadURL = await snapshot.ref.getDownloadURL();
-
-                            // Save metadata to Firestore, but don't display it on the site
-                            await getCollection('gallery').add({
-                                url: downloadURL,
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-
-                            if(fileList) {
-                                const div = document.createElement('div');
-                                div.innerHTML = `<i class="fa-solid fa-check text-green-500"></i> ${file.name}`;
-                                fileList.appendChild(div);
-                            }
-                        }
-                        if(status) {
-                            status.innerHTML = `<span class="text-green-600">Photos sent! Thank you!</span>`;
-                            setTimeout(() => {
-                                status.style.display = 'none';
-                                fileList.innerHTML = '';
-                                photoInput.value = '';
-                            }, 3000);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        if(status) status.innerHTML = `<span class="text-red-500">Error uploading photos: ${error.message}</span>`;
-                    }
-                });
             }
         }
 
