@@ -227,7 +227,7 @@
         </div>
     </section>
 
-    <!-- Guestbook Section -->
+    <!-- Guestbook Section (Read-only view removed) -->
     <section class="py-20 px-4 relative">
         <div class="max-w-3xl mx-auto">
             <div data-aos="fade-up" class="text-center mb-10">
@@ -247,10 +247,6 @@
                     </button>
                     <p id="msg-status" class="text-center text-sm mt-2 hidden"></p>
                 </div>
-            </div>
-
-            <div id="messages-container" class="space-y-4">
-                <!-- Messages load here -->
             </div>
         </div>
     </section>
@@ -398,29 +394,8 @@
 
             // 2. Collection Reference (Simplified for standard Firebase structure)
             const getCollection = (name) => db.collection(name);
-
-            // 3. Load Messages
-            getCollection('messages').orderBy('timestamp', 'desc').limit(20)
-            .onSnapshot(snapshot => {
-                const container = document.getElementById('messages-container');
-                if(!container) return;
-                container.innerHTML = "";
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const msgHtml = `
-                        <div data-aos="fade-up" class="bg-white p-4 rounded-xl shadow-sm border border-pink-50 relative overflow-hidden">
-                            <div class="flex justify-between items-start mb-1 relative z-10">
-                                <h4 class="font-classic text-deep-rose font-bold text-sm">${data.name}</h4>
-                            </div>
-                            <p class="font-body text-gray-600 text-sm italic relative z-10">"${data.text}"</p>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', msgHtml);
-                });
-            }, error => console.error("Message sync error:", error));
             
-            // 4. Submit Message Function
+            // 3. Submit Message Function
             window.submitMessage = async function() {
                 const name = document.getElementById('guest-name').value;
                 const msg = document.getElementById('guest-msg').value;
